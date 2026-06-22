@@ -1,78 +1,62 @@
 async function checkFile() {
 
-    const input =
-        document.getElementById("fileInput");
-
-    const result =
-        document.getElementById("result");
+    const input = document.getElementById("fileInput");
+    const result = document.getElementById("result");
 
     const file = input.files[0];
 
-    const check =
-        checkFileInfo(file);
+    const check = checkFileInfo(file);
 
     if (!check.valid) {
-
-        result.innerHTML =
-            "❌ " + check.message;
-
+        result.innerHTML = "❌ " + check.message;
         return;
     }
 
     try {
 
-        result.innerHTML =
-            "⏳ กำลังวิเคราะห์...";
+        const zip = await JSZip.loadAsync(file);
 
-        const zip =
-            await JSZip.loadAsync(file);
+        const manifest = await readManifest(zip);
 
-        const manifest =
-            await readManifest(zip);
+        const analysis = analyzePack(manifest);
 
-        const analysis =
-            analyzePack(manifest);
-
-        const files =
-            Object.keys(zip.files);
+        const files = Object.keys(zip.files);
 
         result.innerHTML = `
-✅ Minecraft Pack Loaded
+        ✅ Minecraft Pack Loaded
 
-<br><br>
+        <br><br>
 
-📄 ชื่อไฟล์:
-${check.name}
+        📄 ชื่อไฟล์:
+        ${check.name}
 
-<br><br>
+        <br><br>
 
-📦 ขนาด:
-${check.size} KB
+        📦 ขนาด:
+        ${check.size} KB
 
-<br><br>
+        <br><br>
 
-📁 จำนวนไฟล์:
-${files.length}
+        📁 จำนวนไฟล์:
+        ${files.length}
 
-${analysis}
+        <br>
 
-<hr>
+        ${analysis}
 
-📂 รายการไฟล์
+        <hr>
 
-<br><br>
+        <h3>📂 รายการไฟล์</h3>
 
-${files.slice(0,50).join("<br>")}
-`;
+        ${files.join("<br>")}
+        `;
 
-    }
-    catch(error) {
+    } catch (error) {
 
-        result.innerHTML =
-            "❌ เปิดไฟล์ไม่ได้";
+        result.innerHTML = "❌ เปิดไฟล์ไม่ได้";
 
         console.error(error);
-    }
-}
 
-window.checkFile = checkFile;
+    }
+
+}
