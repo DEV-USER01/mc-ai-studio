@@ -3,13 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MC AI Studio</title>
+<title>MC AI Studio V2</title>
 
 <style>
 body{
-font-family:Arial,sans-serif;
 background:#121212;
 color:white;
+font-family:Arial,sans-serif;
 padding:20px;
 }
 
@@ -29,22 +29,22 @@ button{
 background:#00c853;
 color:white;
 border:none;
-padding:10px 20px;
+padding:12px 20px;
 border-radius:10px;
 cursor:pointer;
+font-size:16px;
 }
 
-input{
-width:100%;
-padding:10px;
-margin-top:10px;
+button:hover{
+opacity:0.9;
 }
 
 #result{
-margin-top:15px;
+margin-top:20px;
 padding:15px;
 background:#2d2d2d;
 border-radius:10px;
+line-height:1.8;
 }
 </style>
 </head>
@@ -53,8 +53,11 @@ border-radius:10px;
 
 <div class="container">
 
-<h1>🎮 MC AI Studio</h1>
-<p>อัปโหลดไฟล์ Minecraft และตรวจสอบข้อมูลเบื้องต้น</p>
+<h1>🎮 MC AI Studio V2</h1>
+
+<p>
+ตรวจสอบไฟล์ Minecraft (.mcpack / .mcaddon)
+</p>
 
 <div class="card">
 
@@ -78,19 +81,66 @@ border-radius:10px;
 
 function checkFile(){
 
-const file=document.getElementById("fileInput").files[0];
+const file =
+document.getElementById("fileInput").files[0];
+
+const result =
+document.getElementById("result");
 
 if(!file){
-document.getElementById("result").innerHTML=
+
+result.innerHTML =
 "❌ กรุณาเลือกไฟล์";
+
 return;
+
 }
 
-document.getElementById("result").innerHTML=
-`
-✅ ชื่อไฟล์: ${file.name}<br>
-📦 ขนาด: ${(file.size/1024).toFixed(2)} KB<br>
-📄 ประเภท: ${file.type || "Unknown"}
+const name =
+file.name.toLowerCase();
+
+let type = "";
+let valid = false;
+
+if(name.endsWith(".mcpack")){
+
+type = "Minecraft Pack";
+valid = true;
+
+}
+
+else if(name.endsWith(".mcaddon")){
+
+type = "Minecraft Addon";
+valid = true;
+
+}
+
+if(!valid){
+
+result.innerHTML = `
+❌ ไฟล์นี้ไม่ใช่ Minecraft Pack<br>
+รองรับเฉพาะ .mcpack และ .mcaddon
+`;
+
+return;
+
+}
+
+result.innerHTML = `
+✅ Minecraft Pack Detected<br>
+
+📄 ชื่อไฟล์:
+${file.name}<br>
+
+📦 ขนาด:
+${(file.size/1024).toFixed(2)} KB<br>
+
+🎮 ประเภท:
+${type}<br>
+
+🟢 สถานะ:
+Valid
 `;
 
 }
