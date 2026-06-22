@@ -1,7 +1,9 @@
-function countWorldFiles(files) {
-    return files.filter(file =>
-        file.includes("structures/") ||
-        file.includes("feature_rules/") ||
-        file.includes("spawn_rules/")
-    ).length;
+function analyzeWorld(files) {
+
+    return {
+        levelDat: files.some(f => f.includes("level.dat")),
+        db: files.filter(f => f.includes("db/")).length,
+        structures: files.filter(f => f.includes("structures/")).length
+    };
+
 }
