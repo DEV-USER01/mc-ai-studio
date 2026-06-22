@@ -24,55 +24,53 @@ async function checkFile() {
 
         const manifest = await readManifest(zip);
 
-        if (!manifest) {
-
-            result.innerHTML = `
-            <div class="manifest-box">
-                ❌ ไม่พบ manifest.json
-            </div>
-            `;
-
-            return;
-        }
-
         const files = Object.keys(zip.files);
 
         const fileList = files.join("<br>");
 
-        const header = manifest.header || {};
-        const modules = manifest.modules || [];
-
-        const packType = detectPackType(modules);
-
-        const validation = validatePack(manifest);
-
-        const report = generateReport({
-            name: header.name || "Unknown",
-            version: Array.isArray(header.version)
-                ? header.version.join(".")
-                : "Unknown",
-            type: packType,
-            uuid: header.uuid || "Unknown",
-            score: validation.score,
-            issues: validation.issues
-        });
-
         const analysis = analyzePack(manifest, zip);
 
-        let issuesHtml = "";
+        const header = manifest?.header || {};
+        const modules = manifest?.modules || [];
 
-        if (validation.issues.length > 0) {
+        const packType =
+            typeof detectPackType === "function"
+            ? detectPackType(modules)
+            : "Unknown";
 
-            issuesHtml = `
-            <hr>
+        const validation =
+            typeof validatePack === "function"
+            ? validatePack(manifest)
+            : { score: 100, issues: [] };
 
-            <h3>⚠️ Validation</h3>
+        const report =
+            typeof generateReport === "function"
+            ? generateReport({
+                name: header.name || "Unknown",
+                version: Array.isArray(header.version)
+                    ? header.version.join(".")
+                    : "Unknown",
+                type: packType,
+                uuid: header.uuid || "Unknown",
+                score: validation.score,
+                issues: validation.issues
+            })
+            : "Report not available";
 
-            ${validation.issues
-                .map(issue => `<p>• ${issue}</p>`)
-                .join("")}
-            `;
-        }
+        const iconUrl =
+            typeof extractPackIcon === "function"
+            ? await extractPackIcon(zip)
+            : null;
+
+        const langData =
+            typeof readLanguageFiles === "function"
+            ? await readLanguageFiles(zip)
+            : { count: 0, files: [] };
+
+        const dependencyData =
+            typeof checkDependencies === "function"
+            ? checkDependencies(manifest)
+            : { count: 0, items: [] };
 
         result.innerHTML = `
 
@@ -90,29 +88,35 @@ async function checkFile() {
 
         <div class="manifest-box">
 
-            <h3>📦 Manifest Enhanced</h3>
+            <h3>🖼 Pack Icon</h3>
 
-            <p>🏷️ ชื่อ Pack: ${header.name || "Unknown"}</p>
-
-            <p>📝 คำอธิบาย: ${header.description || "-"}</p>
-
-            <p>🔢 เวอร์ชัน:
             ${
-                Array.isArray(header.version)
-                ? header.version.join(".")
-                : "Unknown"
+                iconUrl
+                ? `<img src="${iconUrl}"
+                    style="
+                    width:128px;
+                    height:128px;
+                    border-radius:12px;
+                    border:1px solid #444;
+                    ">`
+                : "<p>ไม่พบ pack_icon.png</p>"
             }
-            </p>
 
-            <p>🧩 ประเภท: ${packType}</p>
+        </div>
 
-            <p>🆔 UUID: ${header.uuid || "Unknown"}</p>
+        <div class="manifest-box">
 
-            <p style="color:#00ff88;font-weight:bold;">
-                ⭐ คะแนน: ${validation.score}/100
-            </p>
+            <h3>🌐 Language Analysis</h3>
 
-            ${issuesHtml}
+            <p>จำนวนไฟล์ภาษา: ${langData.count}</p>
+
+        </div>
+
+        <div class="manifest-box">
+
+            <h3>🔗 Dependencies</h3>
+
+            <p>จำนวน: ${dependencyData.count}</p>
 
         </div>
 
@@ -120,19 +124,18 @@ async function checkFile() {
 
         <div class="manifest-box">
 
-            <h3>📄 Report</h3>
+            <h3>📄 AI Report</h3>
 
             <pre style="
                 white-space:pre-wrap;
                 line-height:1.5;
-                color:#ddd;
             ">${report}</pre>
 
         </div>
 
         <div class="file-list">
 
-            <h3>📂 รายการไฟล์</h3>
+            <h3>📂 รายการไฟล์ (${files.length})</h3>
 
             ${fileList}
 
