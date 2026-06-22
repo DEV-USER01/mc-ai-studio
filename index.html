@@ -80,7 +80,86 @@ line-height:1.8;
 
 <script>
 
-function checkFile(){
+async function checkFile(){
+
+const file =
+document.getElementById("fileInput").files[0];
+
+const result =
+document.getElementById("result");
+
+if(!file){
+result.innerHTML = "❌ กรุณาเลือกไฟล์";
+return;
+}
+
+const name = file.name.toLowerCase();
+
+if(
+!name.endsWith(".mcpack") &&
+!name.endsWith(".mcaddon")
+){
+result.innerHTML =
+"❌ รองรับเฉพาะ .mcpack และ .mcaddon";
+return;
+}
+
+try{
+
+result.innerHTML =
+"⏳ กำลังอ่านไฟล์...";
+
+const zip =
+await JSZip.loadAsync(file);
+
+let files = "";
+let manifestFound = false;
+let count = 0;
+
+for(const filename in zip.files){
+
+count++;
+
+files += filename + "<br>";
+
+if(
+filename.toLowerCase() ===
+"manifest.json"
+){
+manifestFound = true;
+}
+
+}
+
+result.innerHTML = `
+✅ Minecraft Pack Loaded<br><br>
+
+📄 ชื่อไฟล์:
+${file.name}<br>
+
+📦 จำนวนไฟล์:
+${count}<br>
+
+📋 Manifest:
+${manifestFound ? "✅ พบ" : "❌ ไม่พบ"}
+
+<hr>
+
+<b>รายการไฟล์</b><br>
+${files}
+`;
+
+}
+catch(error){
+
+result.innerHTML =
+"❌ ไม่สามารถเปิดไฟล์ได้";
+
+console.error(error);
+
+}
+
+}{
 
 const file =
 document.getElementById("fileInput").files[0];
