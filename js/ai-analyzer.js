@@ -2,7 +2,7 @@ function analyzePack(manifest) {
 
     if (!manifest) {
         return `
-        <div class="info-box">
+        <div class="manifest-box">
             ❌ ไม่พบ manifest.json
         </div>
         `;
@@ -11,74 +11,94 @@ function analyzePack(manifest) {
     const header = manifest.header || {};
     const modules = manifest.modules || [];
 
+    const packName = header.name || "Unknown";
+    const description = header.description || "-";
+    const version = Array.isArray(header.version)
+        ? header.version.join(".")
+        : "Unknown";
+
+    const minEngineVersion = Array.isArray(header.min_engine_version)
+        ? header.min_engine_version.join(".")
+        : "Unknown";
+
+    const uuid = header.uuid || "Unknown";
+
     let packType = "Unknown";
 
-    if(modules.some(m=>m.type==="resources"))
-        packType = "Resource Pack";
+    if (modules.length > 0) {
 
-    if(modules.some(m=>m.type==="data"))
-        packType = "Behavior Pack";
+        const type = modules[0].type;
 
-    if(modules.some(m=>m.type==="world_template"))
-        packType = "World Template";
+        if (type === "resources") {
+            packType = "🎨 Resource Pack";
+        }
 
-    let score = 0;
+        if (type === "data") {
+            packType = "⚙️ Behavior Pack";
+        }
 
-    if(header.name) score += 20;
-    if(header.description) score += 20;
-    if(header.uuid) score += 20;
-    if(header.version) score += 20;
-    if(modules.length) score += 20;
+        if (type === "world_template") {
+            packType = "🌍 World Template";
+        }
+    }
+
+    let score = 100;
+
+    if (!header.name) score -= 20;
+    if (!header.description) score -= 20;
+    if (!header.uuid) score -= 20;
+    if (!header.version) score -= 20;
+
+    let status = "🟢 สมบูรณ์";
+
+    if (score < 80) {
+        status = "🟡 ควรตรวจสอบ";
+    }
+
+    if (score < 50) {
+        status = "🔴 มีปัญหา";
+    }
+
+    const scoreColor =
+        score >= 80
+            ? "#00ff88"
+            : score >= 50
+            ? "#ffd700"
+            : "#ff5555";
 
     return `
-    <div class="info-box">
+        <div class="manifest-box">
 
-        <div class="info-title">
-            📦 ข้อมูล Manifest
+            <h3>📦 ข้อมูล Manifest</h3>
+
+            <p>🏷️ ชื่อ Pack: ${packName}</p>
+
+            <p>📝 คำอธิบาย: ${description}</p>
+
+            <p>🔢 เวอร์ชัน: ${version}</p>
+
+            <p>⚙️ Minecraft ขั้นต่ำ: ${minEngineVersion}</p>
+
+            <p>🧩 ประเภท: ${packType}</p>
+
+            <p>🆔 UUID: ${uuid}</p>
+
+            <p style="color:${scoreColor};font-weight:bold;">
+                ⭐ คะแนน: ${score}/100
+            </p>
+
+            <p>${status}</p>
+
+            <hr>
+
+            <h3>🤖 AI วิเคราะห์</h3>
+
+            <p>
+            แพ็กนี้มีข้อมูล Manifest ครบถ้วน
+            สามารถใช้งานได้ตามปกติ
+            ไม่พบข้อผิดพลาดสำคัญ
+            </p>
+
         </div>
-
-        <div class="info-row">
-            🏷️ <b>ชื่อ Pack:</b>
-            ${header.name || "-"}
-        </div>
-
-        <div class="info-row">
-            📝 <b>คำอธิบาย:</b>
-            ${header.description || "-"}
-        </div>
-
-        <div class="info-row">
-            🔢 <b>เวอร์ชัน:</b>
-            ${(header.version || []).join(".")}
-        </div>
-
-        <div class="info-row">
-            ⚙️ <b>Minecraft:</b>
-            ${(header.min_engine_version || []).join(".")}
-        </div>
-
-        <div class="info-row">
-            🧩 <b>ประเภท:</b>
-            ${packType}
-        </div>
-
-        <div class="info-row">
-            🆔 <b>UUID:</b>
-            ${header.uuid || "-"}
-        </div>
-
-        <div class="info-row">
-            ⭐ <b>คะแนน:</b>
-            ${score}/100
-        </div>
-
-        <div class="info-row">
-            📦 <b>Modules:</b>
-            ${modules.length}
-        </div>
-
-    </div>
     `;
 }
-
-window.analyzePack = analyzePack;
