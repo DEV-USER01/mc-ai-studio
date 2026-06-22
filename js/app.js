@@ -41,7 +41,10 @@ async function checkFile() {
         const validation =
             typeof validatePack === "function"
             ? validatePack(manifest)
-            : { score: 100, issues: [] };
+            : {
+                score: 100,
+                issues: []
+            };
 
         const report =
             typeof generateReport === "function"
@@ -65,12 +68,63 @@ async function checkFile() {
         const langData =
             typeof readLanguageFiles === "function"
             ? await readLanguageFiles(zip)
-            : { count: 0, files: [] };
+            : {
+                count: 0,
+                files: []
+            };
 
         const dependencyData =
             typeof checkDependencies === "function"
             ? checkDependencies(manifest)
-            : { count: 0, items: [] };
+            : {
+                count: 0,
+                items: []
+            };
+
+        const entityCount =
+            typeof countEntities === "function"
+            ? countEntities(files)
+            : 0;
+
+        const itemCount =
+            typeof countItems === "function"
+            ? countItems(files)
+            : 0;
+
+        const blockCount =
+            typeof countBlocks === "function"
+            ? countBlocks(files)
+            : 0;
+
+        const recipeCount =
+            typeof countRecipes === "function"
+            ? countRecipes(files)
+            : 0;
+
+        const lootCount =
+            typeof countLoot === "function"
+            ? countLoot(files)
+            : 0;
+
+        const worldCount =
+            typeof countWorldFiles === "function"
+            ? countWorldFiles(files)
+            : 0;
+
+        const scriptCount =
+            typeof countScripts === "function"
+            ? countScripts(files)
+            : 0;
+
+        const soundCount =
+            typeof countSounds === "function"
+            ? countSounds(files)
+            : 0;
+
+        const textureCount =
+            typeof countTextures === "function"
+            ? countTextures(files)
+            : 0;
 
         result.innerHTML = `
 
@@ -98,7 +152,8 @@ async function checkFile() {
                     height:128px;
                     border-radius:12px;
                     border:1px solid #444;
-                    ">`
+                    object-fit:cover;
+                ">`
                 : "<p>ไม่พบ pack_icon.png</p>"
             }
 
@@ -121,6 +176,30 @@ async function checkFile() {
         </div>
 
         ${analysis}
+
+        <div class="manifest-box">
+
+            <h3>📊 MC AI Studio V25</h3>
+
+            <p>📦 Entity: ${entityCount}</p>
+
+            <p>🎒 Item: ${itemCount}</p>
+
+            <p>🧱 Block: ${blockCount}</p>
+
+            <p>🍖 Recipe: ${recipeCount}</p>
+
+            <p>🎁 Loot Table: ${lootCount}</p>
+
+            <p>🌍 World Data: ${worldCount}</p>
+
+            <p>📜 Script: ${scriptCount}</p>
+
+            <p>🔊 Sound: ${soundCount}</p>
+
+            <p>🖼 Texture: ${textureCount}</p>
+
+        </div>
 
         <div class="manifest-box">
 
