@@ -95,6 +95,124 @@ const zip = await JSZip.loadAsync(data);
 const files = Object.keys(zip.files);
 
 let manifestFound = false;
+let manifestInfo = "";
+
+for(const filename of files){
+
+    if(filename.toLowerCase().includes("manifest.json")){
+
+        manifestFound = true;
+
+        try{
+
+            const text = await zip.files[filename].async("string");
+            const manifest = JSON.parse(text);
+
+            const header = manifest.header || {};
+
+            const name =
+                header.name || "Unknown";
+
+            const description =
+                header.description || "Unknown";
+
+            const version =
+                header.version
+                ? header.version.join(".")
+                : "Unknown";
+
+            const minEngine =
+                header.min_engine_version
+                ? header.min_engine_version.join(".")
+                : "Unknown";
+
+            manifestInfo = `
+📋 ข้อมูล Manifest
+
+🏷️ ชื่อ:
+${name}
+
+📝 คำอธิบาย:
+${description}
+
+🔢 เวอร์ชัน:
+${version}
+
+⚙️ Minecraft ขั้นต่ำ:
+${minEngine}
+`;
+
+        }catch(err){
+
+            manifestInfo =
+            "❌ อ่าน manifest.json ไม่สำเร็จ";
+
+        }
+
+        break;
+    }
+}
+
+const previewFiles =
+files.slice(0,20).join("<br>");
+
+result.innerHTML = `
+✅ Minecraft Pack Loaded
+
+📄 ชื่อไฟล์:
+${file.name}
+
+📦 ขนาด:
+${(file.size/1024).toFixed(2)} KB
+
+📁 จำนวนไฟล์:
+${files.length}
+
+📋 Manifest:
+${manifestFound ? "✅ พบ" : "❌ ไม่พบ"}
+
+<hr>
+
+${manifestInfo}
+
+<hr>
+
+📂 รายการไฟล์
+
+${previewFiles}
+`;
+
+}
+catch(error){
+
+result.innerHTML = `
+❌ ไม่สามารถเปิดไฟล์ได้
+
+รองรับเฉพาะ .mcpack และ .mcaddon
+`;
+
+console.error(error);
+
+}
+
+}{
+
+const file = document.getElementById("fileInput").files[0];
+const result = document.getElementById("result");
+
+if(!file){
+    result.innerHTML = "❌ กรุณาเลือกไฟล์";
+    return;
+}
+
+try{
+
+const data = await file.arrayBuffer();
+const zip = await JSZip.loadAsync(data);
+
+const files = Object.keys(zip.files);
+
+let manifestFound = false;
 
 files.forEach(file=>{
     if(file.toLowerCase().includes("manifest.json")){
