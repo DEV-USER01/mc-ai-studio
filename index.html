@@ -1,154 +1,205 @@
-async function checkFile() {
+<!DOCTYPE html>
+<html lang="th">
+<head>
 
-    const input = document.getElementById("fileInput");
-    const result = document.getElementById("result");
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    const file = input.files[0];
+<title>MC AI Studio V20</title>
 
-    const check = checkFileInfo(file);
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 
-    if (!check.valid) {
+<style>
 
-        result.innerHTML = `
-        <div class="manifest-box">
-            ❌ ${check.message}
-        </div>
-        `;
-
-        return;
-    }
-
-    try {
-
-        const zip = await JSZip.loadAsync(file);
-
-        const manifest = await readManifest(zip);
-
-        if (!manifest) {
-
-            result.innerHTML = `
-            <div class="manifest-box">
-                ❌ ไม่พบ manifest.json
-            </div>
-            `;
-
-            return;
-        }
-
-        const files = Object.keys(zip.files);
-
-        const fileList = files.join("<br>");
-
-        const header = manifest.header || {};
-        const modules = manifest.modules || [];
-
-        const packType = detectPackType(modules);
-
-        const validation = validatePack(manifest);
-
-        const report = generateReport({
-            name: header.name || "Unknown",
-            version: Array.isArray(header.version)
-                ? header.version.join(".")
-                : "Unknown",
-            type: packType,
-            uuid: header.uuid || "Unknown",
-            score: validation.score,
-            issues: validation.issues
-        });
-
-        const analysis = analyzePack(manifest, zip);
-
-        let issuesHtml = "";
-
-        if (validation.issues.length > 0) {
-
-            issuesHtml = `
-            <hr>
-
-            <h3>⚠️ Validation</h3>
-
-            ${validation.issues
-                .map(issue => `<p>• ${issue}</p>`)
-                .join("")}
-            `;
-        }
-
-        result.innerHTML = `
-
-        <div class="manifest-box">
-
-            <h3>✅ Minecraft Pack Loaded</h3>
-
-            <p>📄 ชื่อไฟล์: ${check.name}</p>
-
-            <p>📦 ขนาด: ${check.size} KB</p>
-
-            <p>📁 จำนวนไฟล์: ${files.length}</p>
-
-        </div>
-
-        <div class="manifest-box">
-
-            <h3>📦 Manifest Enhanced</h3>
-
-            <p>🏷️ ชื่อ Pack: ${header.name || "Unknown"}</p>
-
-            <p>📝 คำอธิบาย: ${header.description || "-"}</p>
-
-            <p>🔢 เวอร์ชัน:
-            ${
-                Array.isArray(header.version)
-                ? header.version.join(".")
-                : "Unknown"
-            }
-            </p>
-
-            <p>🧩 ประเภท: ${packType}</p>
-
-            <p>🆔 UUID: ${header.uuid || "Unknown"}</p>
-
-            <p style="color:#00ff88;font-weight:bold;">
-                ⭐ คะแนน: ${validation.score}/100
-            </p>
-
-            ${issuesHtml}
-
-        </div>
-
-        ${analysis}
-
-        <div class="manifest-box">
-
-            <h3>📄 Report</h3>
-
-            <pre style="
-                white-space:pre-wrap;
-                line-height:1.5;
-                color:#ddd;
-            ">${report}</pre>
-
-        </div>
-
-        <div class="file-list">
-
-            <h3>📂 รายการไฟล์</h3>
-
-            ${fileList}
-
-        </div>
-
-        `;
-
-    }
-    catch(error) {
-
-        result.innerHTML = `
-        <div class="manifest-box">
-            ❌ เปิดไฟล์ไม่ได้
-        </div>
-        `;
-
-        console.error(error);
-    }
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
 }
+
+body{
+    background:#0f0f0f;
+    color:#fff;
+    font-family:Arial,sans-serif;
+    padding:15px;
+}
+
+.container{
+    max-width:1000px;
+    margin:auto;
+}
+
+h1{
+    margin-bottom:8px;
+}
+
+.subtitle{
+    color:#bdbdbd;
+    margin-bottom:15px;
+}
+
+.upload-box{
+    background:#1f1f1f;
+    padding:15px;
+    border-radius:12px;
+    margin-bottom:15px;
+}
+
+input[type=file]{
+    width:100%;
+    margin-bottom:12px;
+}
+
+button{
+    background:#00c853;
+    color:white;
+    border:none;
+    padding:12px 18px;
+    border-radius:8px;
+    cursor:pointer;
+    font-size:15px;
+    font-weight:bold;
+}
+
+button:hover{
+    background:#00e676;
+}
+
+#result{
+    margin-top:15px;
+}
+
+.manifest-box{
+    background:#1f1f1f;
+    padding:15px;
+    border-radius:12px;
+    margin-bottom:15px;
+    border:1px solid #333;
+}
+
+.manifest-box h3{
+    margin-bottom:12px;
+}
+
+.manifest-box p{
+    margin:8px 0;
+    line-height:1.6;
+}
+
+.file-list{
+    background:#1f1f1f;
+    padding:15px;
+    border-radius:12px;
+    border:1px solid #333;
+    overflow:auto;
+    max-height:600px;
+    line-height:1.5;
+}
+
+.file-list h3{
+    margin-bottom:12px;
+}
+
+hr{
+    border:none;
+    border-top:1px solid #444;
+    margin:15px 0;
+}
+
+.footer{
+    text-align:center;
+    color:#888;
+    margin-top:20px;
+    font-size:13px;
+}
+
+pre{
+    white-space:pre-wrap;
+    word-break:break-word;
+}
+
+.score-good{
+    color:#00ff88;
+    font-weight:bold;
+}
+
+.score-mid{
+    color:#ffd700;
+    font-weight:bold;
+}
+
+.score-bad{
+    color:#ff4444;
+    font-weight:bold;
+}
+
+@media(max-width:768px){
+
+    body{
+        padding:10px;
+    }
+
+    h1{
+        font-size:30px;
+    }
+
+    .manifest-box,
+    .file-list,
+    .upload-box{
+        padding:12px;
+    }
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>🎮 MC AI Studio V20</h1>
+
+    <div class="subtitle">
+        วิเคราะห์ Minecraft Pack (.mcpack / .mcaddon)
+    </div>
+
+    <div class="upload-box">
+
+        <input
+            type="file"
+            id="fileInput"
+            accept=".mcpack,.mcaddon,.zip"
+        >
+
+        <button onclick="checkFile()">
+            🔍 ตรวจสอบไฟล์
+        </button>
+
+    </div>
+
+    <div id="result"></div>
+
+    <div class="footer">
+        MC AI Studio V20 • Minecraft Pack Analyzer
+    </div>
+
+</div>
+
+<script src="js/file-checker.js"></script>
+<script src="js/manifest-reader.js"></script>
+<script src="js/ai-analyzer.js"></script>
+
+<script src="js/pack-type-detector.js"></script>
+<script src="js/pack-validator.js"></script>
+<script src="js/report-generator.js"></script>
+
+<script src="js/dependency-check.js"></script>
+<script src="js/icon-reader.js"></script>
+<script src="js/lang-reader.js"></script>
+
+<script src="js/app.js"></script>
+
+</body>
+</html>
