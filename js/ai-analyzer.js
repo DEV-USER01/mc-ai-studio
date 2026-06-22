@@ -2,7 +2,9 @@ function analyzePack(manifest) {
 
     if (!manifest) {
         return `
-        <h3>❌ ไม่พบ manifest.json</h3>
+        <div class="info-box">
+            ❌ ไม่พบ manifest.json
+        </div>
         `;
     }
 
@@ -11,39 +13,72 @@ function analyzePack(manifest) {
 
     let packType = "Unknown";
 
-    if (modules.some(m => m.type === "resources")) {
+    if(modules.some(m=>m.type==="resources"))
         packType = "Resource Pack";
-    }
 
-    if (modules.some(m => m.type === "data")) {
+    if(modules.some(m=>m.type==="data"))
         packType = "Behavior Pack";
-    }
 
-    if (modules.some(m => m.type === "world_template")) {
+    if(modules.some(m=>m.type==="world_template"))
         packType = "World Template";
-    }
-
-    return `
-    <h3>📦 ข้อมูล Manifest</h3>
-
-    🏷️ ชื่อ Pack: ${header.name || "ไม่พบ"}<br>
-    📝 คำอธิบาย: ${header.description || "ไม่พบ"}<br>
-    🔢 เวอร์ชัน: ${(header.version || []).join(".")}<br>
-    ⚙️ Minecraft ขั้นต่ำ: ${(header.min_engine_version || []).join(".")}<br>
-    🧩 ประเภท: ${packType}<br>
-    🆔 UUID: ${header.uuid || "ไม่พบ"}<br>
-    `;
-}
-
-function calculateScore(header, modules) {
 
     let score = 0;
 
-    if (header.name) score += 20;
-    if (header.description) score += 20;
-    if (header.uuid) score += 20;
-    if (header.version) score += 20;
-    if (modules.length > 0) score += 20;
+    if(header.name) score += 20;
+    if(header.description) score += 20;
+    if(header.uuid) score += 20;
+    if(header.version) score += 20;
+    if(modules.length) score += 20;
 
-    return score;
+    return `
+    <div class="info-box">
+
+        <div class="info-title">
+            📦 ข้อมูล Manifest
+        </div>
+
+        <div class="info-row">
+            🏷️ <b>ชื่อ Pack:</b>
+            ${header.name || "-"}
+        </div>
+
+        <div class="info-row">
+            📝 <b>คำอธิบาย:</b>
+            ${header.description || "-"}
+        </div>
+
+        <div class="info-row">
+            🔢 <b>เวอร์ชัน:</b>
+            ${(header.version || []).join(".")}
+        </div>
+
+        <div class="info-row">
+            ⚙️ <b>Minecraft:</b>
+            ${(header.min_engine_version || []).join(".")}
+        </div>
+
+        <div class="info-row">
+            🧩 <b>ประเภท:</b>
+            ${packType}
+        </div>
+
+        <div class="info-row">
+            🆔 <b>UUID:</b>
+            ${header.uuid || "-"}
+        </div>
+
+        <div class="info-row">
+            ⭐ <b>คะแนน:</b>
+            ${score}/100
+        </div>
+
+        <div class="info-row">
+            📦 <b>Modules:</b>
+            ${modules.length}
+        </div>
+
+    </div>
+    `;
 }
+
+window.analyzePack = analyzePack;
