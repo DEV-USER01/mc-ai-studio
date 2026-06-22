@@ -3,58 +3,55 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MC AI Studio V3</title>
+<title>MC AI Studio V4</title>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 
 <style>
 body{
-background:#121212;
-color:white;
-font-family:Arial,sans-serif;
-padding:20px;
+    background:#121212;
+    color:white;
+    font-family:Arial,sans-serif;
+    padding:20px;
 }
 
 .container{
-max-width:800px;
-margin:auto;
+    max-width:800px;
+    margin:auto;
 }
 
 .card{
-background:#1e1e1e;
-padding:20px;
-border-radius:15px;
-margin-top:20px;
+    background:#1e1e1e;
+    padding:20px;
+    border-radius:15px;
 }
 
 button{
-background:#00c853;
-color:white;
-border:none;
-padding:12px 20px;
-border-radius:10px;
-cursor:pointer;
-font-size:16px;
+    background:#00c853;
+    color:white;
+    border:none;
+    padding:12px 20px;
+    border-radius:10px;
+    cursor:pointer;
+    font-size:16px;
 }
 
 #result{
-margin-top:20px;
-padding:15px;
-background:#2d2d2d;
-border-radius:10px;
-line-height:1.8;
-word-break:break-word;
-max-height:500px;
-overflow:auto;
+    margin-top:20px;
+    background:#2d2d2d;
+    padding:15px;
+    border-radius:10px;
+    line-height:1.8;
+    white-space:pre-wrap;
 }
 </style>
-
 </head>
+
 <body>
 
 <div class="container">
 
-<h1>🎮 MC AI Studio V3</h1>
+<h1>🎮 MC AI Studio V4</h1>
 
 <p>
 ตรวจสอบไฟล์ Minecraft (.mcpack / .mcaddon)
@@ -82,84 +79,62 @@ overflow:auto;
 
 async function checkFile(){
 
-const file =
-document.getElementById("fileInput").files[0];
-
-const result =
-document.getElementById("result");
+const file = document.getElementById("fileInput").files[0];
+const result = document.getElementById("result");
 
 if(!file){
-result.innerHTML =
-"❌ กรุณาเลือกไฟล์";
-return;
-}
-
-const name =
-file.name.toLowerCase();
-
-if(
-!name.endsWith(".mcpack") &&
-!name.endsWith(".mcaddon")
-){
-result.innerHTML =
-"❌ รองรับเฉพาะ .mcpack และ .mcaddon";
-return;
+    result.innerHTML = "❌ กรุณาเลือกไฟล์";
+    return;
 }
 
 try{
 
-result.innerHTML =
-"⏳ กำลังอ่านไฟล์...";
+const data = await file.arrayBuffer();
+const zip = await JSZip.loadAsync(data);
 
-const zip =
-await JSZip.loadAsync(file);
+const files = Object.keys(zip.files);
 
-let fileList = "";
-let count = 0;
 let manifestFound = false;
 
-for(const filename in zip.files){
+files.forEach(file=>{
+    if(file.toLowerCase().includes("manifest.json")){
+        manifestFound = true;
+    }
+});
 
-count++;
-
-fileList += filename + "<br>";
-
-if(
-filename.toLowerCase() ===
-"manifest.json"
-){
-manifestFound = true;
-}
-
-}
+const previewFiles = files.slice(0,20).join("<br>");
 
 result.innerHTML = `
-✅ Minecraft Pack Loaded<br><br>
+✅ Minecraft Pack Loaded
 
 📄 ชื่อไฟล์:
-${file.name}<br>
+${file.name}
 
 📦 ขนาด:
-${(file.size/1024).toFixed(2)} KB<br>
+${(file.size/1024).toFixed(2)} KB
 
 📁 จำนวนไฟล์:
-${count}<br>
+${files.length}
 
 📋 Manifest:
 ${manifestFound ? "✅ พบ" : "❌ ไม่พบ"}
 
 <hr>
 
-<b>📂 รายการไฟล์</b><br>
+📂 รายการไฟล์
 
-${fileList}
+${previewFiles}
+
 `;
 
 }
 catch(error){
 
-result.innerHTML =
-"❌ ไม่สามารถเปิดไฟล์ได้";
+result.innerHTML = `
+❌ ไม่สามารถเปิดไฟล์ได้
+
+รองรับเฉพาะ .mcpack และ .mcaddon
+`;
 
 console.error(error);
 
@@ -169,7 +144,5 @@ console.error(error);
 
 </script>
 
-<script src="js/app.js"></script>  
-  
 </body>
 </html>
