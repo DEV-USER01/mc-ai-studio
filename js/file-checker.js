@@ -1,4 +1,4 @@
-function checkFile(file) {
+function checkFileInfo(file) {
     if (!file) {
         return {
             valid: false,
