@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MC AI Studio V4</title>
+<title>MC AI Studio V5</title>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 
@@ -16,7 +16,7 @@ body{
 }
 
 .container{
-    max-width:800px;
+    max-width:900px;
     margin:auto;
 }
 
@@ -45,17 +45,15 @@ button{
     white-space:pre-wrap;
 }
 </style>
-</head>
 
+</head>
 <body>
 
 <div class="container">
 
-<h1>🎮 MC AI Studio V4</h1>
+<h1>🎮 MC AI Studio V5</h1>
 
-<p>
-ตรวจสอบไฟล์ Minecraft (.mcpack / .mcaddon)
-</p>
+<p>ตรวจสอบไฟล์ Minecraft (.mcpack / .mcaddon)</p>
 
 <div class="card">
 
@@ -95,63 +93,63 @@ const zip = await JSZip.loadAsync(data);
 const files = Object.keys(zip.files);
 
 let manifestFound = false;
-let manifestInfo = "";
+
+let packName = "Unknown";
+let description = "Unknown";
+let version = "Unknown";
+let minEngine = "Unknown";
 
 for(const filename of files){
 
-    if(filename.toLowerCase().includes("manifest.json")){
+    if(filename.toLowerCase().endsWith("manifest.json")){
 
         manifestFound = true;
 
         try{
 
-            const text = await zip.files[filename].async("string");
-            const manifest = JSON.parse(text);
+            const text =
+                await zip.files[filename].async("string");
 
-            const header = manifest.header || {};
+            const manifest =
+                JSON.parse(text);
 
-            const name =
-                header.name || "Unknown";
+            if(manifest.header){
 
-            const description =
-                header.description || "Unknown";
+                packName =
+                    manifest.header.name || "Unknown";
 
-            const version =
-                header.version
-                ? header.version.join(".")
-                : "Unknown";
+                description =
+                    manifest.header.description || "Unknown";
 
-            const minEngine =
-                header.min_engine_version
-                ? header.min_engine_version.join(".")
-                : "Unknown";
+                version =
+                    manifest.header.version
+                    ? manifest.header.version.join(".")
+                    : "Unknown";
 
-            manifestInfo = `
-📋 ข้อมูล Manifest
-
-🏷️ ชื่อ:
-${name}
-
-📝 คำอธิบาย:
-${description}
-
-🔢 เวอร์ชัน:
-${version}
-
-⚙️ Minecraft ขั้นต่ำ:
-${minEngine}
-`;
+                minEngine =
+                    manifest.header.min_engine_version
+                    ? manifest.header.min_engine_version.join(".")
+                    : "Unknown";
+            }
 
         }catch(err){
-
-            manifestInfo =
-            "❌ อ่าน manifest.json ไม่สำเร็จ";
-
+            console.error(err);
         }
 
         break;
     }
 }
+
+let packType = "Unknown";
+
+if(files.some(f=>f.startsWith("textures/")))
+    packType = "Resource Pack";
+
+if(files.some(f=>f.startsWith("entities/")))
+    packType = "Behavior Pack";
+
+if(files.some(f=>f.startsWith("skins/")))
+    packType = "Skin Pack";
 
 const previewFiles =
 files.slice(0,20).join("<br>");
@@ -168,12 +166,27 @@ ${(file.size/1024).toFixed(2)} KB
 📁 จำนวนไฟล์:
 ${files.length}
 
+🎮 ประเภท:
+${packType}
+
 📋 Manifest:
 ${manifestFound ? "✅ พบ" : "❌ ไม่พบ"}
 
 <hr>
 
-${manifestInfo}
+📋 ข้อมูล Manifest
+
+🏷️ ชื่อ Pack:
+${packName}
+
+📝 คำอธิบาย:
+${description}
+
+🔢 เวอร์ชัน:
+${version}
+
+⚙️ Minecraft ขั้นต่ำ:
+${minEngine}
 
 <hr>
 
@@ -182,71 +195,7 @@ ${manifestInfo}
 ${previewFiles}
 `;
 
-}
-catch(error){
-
-result.innerHTML = `
-❌ ไม่สามารถเปิดไฟล์ได้
-
-รองรับเฉพาะ .mcpack และ .mcaddon
-`;
-
-console.error(error);
-
-}
-
-}{
-
-const file = document.getElementById("fileInput").files[0];
-const result = document.getElementById("result");
-
-if(!file){
-    result.innerHTML = "❌ กรุณาเลือกไฟล์";
-    return;
-}
-
-try{
-
-const data = await file.arrayBuffer();
-const zip = await JSZip.loadAsync(data);
-
-const files = Object.keys(zip.files);
-
-let manifestFound = false;
-
-files.forEach(file=>{
-    if(file.toLowerCase().includes("manifest.json")){
-        manifestFound = true;
-    }
-});
-
-const previewFiles = files.slice(0,20).join("<br>");
-
-result.innerHTML = `
-✅ Minecraft Pack Loaded
-
-📄 ชื่อไฟล์:
-${file.name}
-
-📦 ขนาด:
-${(file.size/1024).toFixed(2)} KB
-
-📁 จำนวนไฟล์:
-${files.length}
-
-📋 Manifest:
-${manifestFound ? "✅ พบ" : "❌ ไม่พบ"}
-
-<hr>
-
-📂 รายการไฟล์
-
-${previewFiles}
-
-`;
-
-}
-catch(error){
+}catch(error){
 
 result.innerHTML = `
 ❌ ไม่สามารถเปิดไฟล์ได้
