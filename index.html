@@ -1,146 +1,63 @@
-<!DOCTYPE html>
-<html lang="th">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>MC AI Studio V9</title>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-
-<style>
-
 body{
-    background:#121212;
-    color:#ffffff;
+    background:#111;
+    color:white;
     font-family:Arial,sans-serif;
     padding:20px;
-    margin:0;
 }
 
 .container{
-    max-width:1000px;
+    max-width:900px;
     margin:auto;
-}
-
-.card{
-    background:#1e1e1e;
-    padding:20px;
-    border-radius:15px;
-    margin-top:20px;
-}
-
-h1{
-    margin:0;
-    margin-bottom:10px;
 }
 
 button{
     background:#00c853;
     color:white;
     border:none;
-    padding:12px 20px;
-    border-radius:10px;
+    padding:10px 16px;
+    border-radius:8px;
     cursor:pointer;
-    font-size:16px;
 }
 
 button:hover{
-    opacity:.9;
-}
-
-input[type=file]{
-    width:100%;
-    padding:10px;
-    background:#2d2d2d;
-    color:white;
-    border-radius:8px;
-    border:none;
+    background:#00e676;
 }
 
 #result{
-    margin-top:20px;
-    background:#2d2d2d;
+    background:#222;
     padding:15px;
-    border-radius:10px;
-    line-height:1.5;
-    overflow:auto;
+    border-radius:12px;
+    margin-top:15px;
 }
 
-.info-box{
-    background:#242424;
-    border-radius:10px;
+.manifest-box{
+    background:#252525;
     padding:15px;
-    margin-top:10px;
+    border-radius:12px;
+    margin-top:15px;
+    line-height:1.6;
 }
 
-.info-title{
-    font-size:20px;
-    font-weight:bold;
-    margin-bottom:12px;
+.manifest-box h3{
+    margin:0 0 10px 0;
+    color:#fff;
 }
 
-.info-row{
-    margin:8px 0;
+.manifest-box p{
+    margin:6px 0;
 }
 
 .file-list{
-    background:#1a1a1a;
-    border-radius:10px;
-    padding:10px;
-    margin-top:10px;
-    max-height:300px;
-    overflow:auto;
+    background:#252525;
+    padding:15px;
+    border-radius:12px;
+    margin-top:15px;
+    line-height:1.5;
+    white-space:pre-line;
 }
 
 hr{
     border:none;
-    border-top:1px solid #444;
+    border-top:1px solid #555;
     margin:15px 0;
 }
-
-</style>
-
-</head>
-<body>
-
-<div class="container">
-
-<h1>🎮 MC AI Studio V9</h1>
-
-<p>
-ตรวจสอบ Minecraft Pack (.mcpack / .mcaddon)
-</p>
-
-<div class="card">
-
-<input type="file" id="fileInput">
-
-<br><br>
-
-<button onclick="checkFile()">
-🔍 ตรวจสอบไฟล์
-</button>
-
-<div id="result">
-
-<div class="info-box">
-เลือกไฟล์ .mcpack หรือ .mcaddon เพื่อเริ่มวิเคราะห์
-</div>
-
-</div>
-
-</div>
-
-</div>
-
-<script src="js/file-checker.js"></script>
-<script src="js/manifest-reader.js"></script>
-<script src="js/pack-type-detector.js"></script>
-<script src="js/pack-validator.js"></script>
-<script src="js/report-generator.js"></script>
-<script src="js/ai-analyzer.js"></script>
-<script src="js/app.js"></script>
-
-</body>
-</html>
