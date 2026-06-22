@@ -6,7 +6,10 @@ async function readManifest(zip) {
         return null;
     }
 
-    const text = await manifestFile.async("string");
+    const text =
+        await manifestFile.async("string");
 
     return JSON.parse(text);
 }
+
+window.readManifest = readManifest;
