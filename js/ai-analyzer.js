@@ -1,32 +1,62 @@
+function getPackType(manifest) {
+
+    if (!manifest || !manifest.modules) {
+        return "Unknown";
+    }
+
+    const types = manifest.modules.map(m => m.type);
+
+    if (types.includes("resources")) {
+        return "Resource Pack";
+    }
+
+    if (types.includes("data")) {
+        return "Behavior Pack";
+    }
+
+    return "Unknown";
+}
+
 function analyzePack(manifest) {
 
     if (!manifest) {
-        return `
-<hr>
-
-📋 ข้อมูล Manifest
-
-❌ ไม่พบ manifest.json
-`;
+        return "❌ ไม่พบ manifest.json";
     }
 
+    const packType = getPackType(manifest);
+
     return `
-<hr>
+    <hr>
 
-📋 ข้อมูล Manifest
+    <h3>📦 ข้อมูล Manifest</h3>
 
-🏷️ ชื่อ Pack:
-${manifest.header?.name || "Unknown"}
+    🏷️ ชื่อ Pack:
+    ${manifest.header?.name || "Unknown"}
 
-📝 คำอธิบาย:
-${manifest.header?.description || "ไม่มี"}
+    <br><br>
 
-🔢 เวอร์ชัน:
-${(manifest.header?.version || []).join(".")}
+    📝 คำอธิบาย:
+    ${manifest.header?.description || "-"}
 
-⚙️ Minecraft ขั้นต่ำ:
-${(manifest.header?.min_engine_version || []).join(".")}
-`;
+    <br><br>
+
+    🔢 เวอร์ชัน:
+    ${(manifest.header?.version || []).join(".")}
+
+    <br><br>
+
+    ⚙️ Minecraft ขั้นต่ำ:
+    ${(manifest.header?.min_engine_version || []).join(".")}
+
+    <br><br>
+
+    🧩 ประเภท:
+    ${packType}
+
+    <br><br>
+
+    🆔 UUID:
+    ${manifest.header?.uuid || "-"}
+
+    `;
 }
-
-window.analyzePack = analyzePack;
