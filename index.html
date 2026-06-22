@@ -1,10 +1,101 @@
 <!DOCTYPE html>
-<html>
+<html lang="th">
 <head>
-  <title>MC AI Studio</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MC AI Studio</title>
+
+<style>
+body{
+font-family:Arial,sans-serif;
+background:#121212;
+color:white;
+padding:20px;
+}
+
+.container{
+max-width:700px;
+margin:auto;
+}
+
+.card{
+background:#1e1e1e;
+padding:20px;
+border-radius:15px;
+margin-top:20px;
+}
+
+button{
+background:#00c853;
+color:white;
+border:none;
+padding:10px 20px;
+border-radius:10px;
+cursor:pointer;
+}
+
+input{
+width:100%;
+padding:10px;
+margin-top:10px;
+}
+
+#result{
+margin-top:15px;
+padding:15px;
+background:#2d2d2d;
+border-radius:10px;
+}
+</style>
 </head>
+
 <body>
-  <h1>MC AI Studio</h1>
-  <p>เว็บ AI สำหรับ Minecraft</p>
+
+<div class="container">
+
+<h1>🎮 MC AI Studio</h1>
+<p>อัปโหลดไฟล์ Minecraft และตรวจสอบข้อมูลเบื้องต้น</p>
+
+<div class="card">
+
+<input type="file" id="fileInput">
+
+<br><br>
+
+<button onclick="checkFile()">
+ตรวจสอบไฟล์
+</button>
+
+<div id="result">
+ยังไม่มีไฟล์
+</div>
+
+</div>
+
+</div>
+
+<script>
+
+function checkFile(){
+
+const file=document.getElementById("fileInput").files[0];
+
+if(!file){
+document.getElementById("result").innerHTML=
+"❌ กรุณาเลือกไฟล์";
+return;
+}
+
+document.getElementById("result").innerHTML=
+`
+✅ ชื่อไฟล์: ${file.name}<br>
+📦 ขนาด: ${(file.size/1024).toFixed(2)} KB<br>
+📄 ประเภท: ${file.type || "Unknown"}
+`;
+
+}
+
+</script>
+
 </body>
 </html>
