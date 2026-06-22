@@ -5,7 +5,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>MC AI Studio V20</title>
+<title>MC AI Studio V25</title>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 
@@ -133,6 +133,14 @@ pre{
     font-weight:bold;
 }
 
+.pack-icon{
+    width:128px;
+    height:128px;
+    object-fit:cover;
+    border-radius:12px;
+    border:1px solid #444;
+}
+
 @media(max-width:768px){
 
     body{
@@ -159,7 +167,7 @@ pre{
 
 <div class="container">
 
-    <h1>🎮 MC AI Studio V20</h1>
+    <h1>🎮 MC AI Studio V25</h1>
 
     <div class="subtitle">
         วิเคราะห์ Minecraft Pack (.mcpack / .mcaddon)
@@ -182,7 +190,7 @@ pre{
     <div id="result"></div>
 
     <div class="footer">
-        MC AI Studio V20 • Minecraft Pack Analyzer
+        MC AI Studio V25 • Minecraft Pack Analyzer
     </div>
 
 </div>
@@ -198,6 +206,16 @@ pre{
 <script src="js/dependency-check.js"></script>
 <script src="js/icon-reader.js"></script>
 <script src="js/lang-reader.js"></script>
+
+<script src="js/entity-reader.js"></script>
+<script src="js/item-reader.js"></script>
+<script src="js/block-reader.js"></script>
+<script src="js/recipe-reader.js"></script>
+<script src="js/loot-reader.js"></script>
+<script src="js/world-reader.js"></script>
+<script src="js/script-reader.js"></script>
+<script src="js/sound-reader.js"></script>
+<script src="js/texture-reader.js"></script>
 
 <script src="js/app.js"></script>
 
