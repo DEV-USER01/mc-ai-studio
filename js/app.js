@@ -8,7 +8,13 @@ async function checkFile() {
     const check = checkFileInfo(file);
 
     if (!check.valid) {
-        result.innerHTML = "❌ " + check.message;
+
+        result.innerHTML = `
+        <div class="manifest-box">
+            ❌ ${check.message}
+        </div>
+        `;
+
         return;
     }
 
@@ -18,45 +24,47 @@ async function checkFile() {
 
         const manifest = await readManifest(zip);
 
-        const analysis = analyzePack(manifest);
+        const analysis = analyzePack(manifest, zip);
 
         const files = Object.keys(zip.files);
 
+        const fileList = files.join("<br>");
+
         result.innerHTML = `
-        ✅ Minecraft Pack Loaded
 
-        <br><br>
+        <div class="manifest-box">
 
-        📄 ชื่อไฟล์:
-        ${check.name}
+            <h3>✅ Minecraft Pack Loaded</h3>
 
-        <br><br>
+            <p>📄 ชื่อไฟล์: ${check.name}</p>
 
-        📦 ขนาด:
-        ${check.size} KB
+            <p>📦 ขนาด: ${check.size} KB</p>
 
-        <br><br>
+            <p>📁 จำนวนไฟล์: ${files.length}</p>
 
-        📁 จำนวนไฟล์:
-        ${files.length}
-
-        <br>
+        </div>
 
         ${analysis}
 
-        <hr>
+        <div class="file-list">
 
-        <h3>📂 รายการไฟล์</h3>
+            <h3>📂 รายการไฟล์</h3>
 
-        ${files.join("<br>")}
+            ${fileList}
+
+        </div>
+
         `;
 
-    } catch (error) {
+    }
+    catch(error) {
 
-        result.innerHTML = "❌ เปิดไฟล์ไม่ได้";
+        result.innerHTML = `
+        <div class="manifest-box">
+            ❌ เปิดไฟล์ไม่ได้
+        </div>
+        `;
 
         console.error(error);
-
     }
-
 }
