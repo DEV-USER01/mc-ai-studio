@@ -28,6 +28,40 @@ async function checkFile() {
 
         const fileList = files.join("<br>");
 
+        const langData =
+            typeof readLanguageFiles === "function"
+            ? await readLanguageFiles(zip)
+            : {
+                count: 0,
+                files: [],
+                translations: {}
+            };
+
+        if (manifest?.header) {
+
+            if (
+                langData.translations[
+                    manifest.header.name
+                ]
+            ) {
+                manifest.header.name =
+                    langData.translations[
+                        manifest.header.name
+                    ];
+            }
+
+            if (
+                langData.translations[
+                    manifest.header.description
+                ]
+            ) {
+                manifest.header.description =
+                    langData.translations[
+                        manifest.header.description
+                    ];
+            }
+        }
+
         const analysis = analyzePack(manifest, zip);
 
         const header = manifest?.header || {};
@@ -64,14 +98,6 @@ async function checkFile() {
             typeof extractPackIcon === "function"
             ? await extractPackIcon(zip)
             : null;
-
-        const langData =
-            typeof readLanguageFiles === "function"
-            ? await readLanguageFiles(zip)
-            : {
-                count: 0,
-                files: []
-            };
 
         const dependencyData =
             typeof checkDependencies === "function"
@@ -146,14 +172,7 @@ async function checkFile() {
 
             ${
                 iconUrl
-                ? `<img src="${iconUrl}"
-                    style="
-                    width:128px;
-                    height:128px;
-                    border-radius:12px;
-                    border:1px solid #444;
-                    object-fit:cover;
-                ">`
+                ? `<img src="${iconUrl}" style="width:128px;height:128px;border-radius:10px;">`
                 : "<p>ไม่พบ pack_icon.png</p>"
             }
 
@@ -179,7 +198,7 @@ async function checkFile() {
 
         <div class="manifest-box">
 
-            <h3>📊 MC AI Studio V25</h3>
+            <h3>📊 MC AI Studio V26</h3>
 
             <p>📦 Entity: ${entityCount}</p>
 
@@ -205,10 +224,7 @@ async function checkFile() {
 
             <h3>📄 AI Report</h3>
 
-            <pre style="
-                white-space:pre-wrap;
-                line-height:1.5;
-            ">${report}</pre>
+            <pre>${report}</pre>
 
         </div>
 
@@ -219,11 +235,9 @@ async function checkFile() {
             ${fileList}
 
         </div>
-
         `;
-
     }
-    catch(error) {
+    catch (error) {
 
         result.innerHTML = `
         <div class="manifest-box">
